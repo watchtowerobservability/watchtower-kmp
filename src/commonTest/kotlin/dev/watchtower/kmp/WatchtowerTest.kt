@@ -26,9 +26,9 @@ class WatchtowerTest {
         Watchtower.setBridge(f)
         Watchtower.start(WatchtowerConfig(KEY, "svc", release = "1.0"))
         assertEquals("1.0", f.started?.release)
-        val boom = IllegalStateException("boom")
+        val boom: Throwable = IllegalStateException("boom")
         Watchtower.recordError(boom, handled = false)
-        assertEquals(listOf(boom to false), f.errors)
+        assertEquals(listOf<Pair<Throwable, Boolean>>(boom to false), f.errors.toList())
     }
 
     @Test fun blankKeyRejected() {
