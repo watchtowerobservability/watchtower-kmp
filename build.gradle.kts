@@ -30,7 +30,7 @@ kotlin {
 
     sourceSets {
         val androidMain by getting {
-            dependencies { api("dev.watchtower:watchtower-android:0.1.0") }
+            dependencies { api("dev.watchtower:watchtower-android:0.1.1") }
         }
         val commonTest by getting {
             dependencies { implementation(kotlin("test")) }
