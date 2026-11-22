@@ -31,6 +31,14 @@ class WatchtowerTest {
         assertEquals(listOf<Pair<Throwable, Boolean>>(boom to false), f.errors.toList())
     }
 
+    @Test fun rumOptionsReachTheBridgeMap() {
+        val o = WatchtowerConfig(KEY, "svc", trackViews = false, hangThresholdMs = 3000, profileLaunch = true, buildId = "b1").rumOptions()
+        assertEquals(false, o["trackViews"])
+        assertEquals(3000L, o["hangThresholdMs"])
+        assertEquals(true, o["profileLaunch"])
+        assertEquals("b1", o["buildId"])
+    }
+
     @Test fun blankKeyRejected() {
         Watchtower.setBridge(Fake())
         assertFailsWith<IllegalArgumentException> { Watchtower.start(WatchtowerConfig(" ", "svc")) }

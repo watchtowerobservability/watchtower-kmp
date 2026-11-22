@@ -12,6 +12,11 @@ private class AndroidBridge(private val app: Application) : NativeBridge {
             release = config.release,
             environment = config.environment,
             replay = ReplayConfig(enabled = config.replay, maskText = config.maskText),
+            trackViews = config.trackViews,
+            anrThresholdMs = config.hangThresholdMs,
+            propagateTo = config.propagateTo,
+            profileLaunch = config.profileLaunch,
+            buildId = config.buildId,
         )
         config.endpoint?.let { c = c.copy(endpoint = it) }
         dev.watchtower.Watchtower.init(app, c)

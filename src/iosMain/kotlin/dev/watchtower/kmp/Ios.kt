@@ -8,6 +8,8 @@ interface IosNativeBridge {
     fun start(
         key: String, service: String, endpoint: String?, release: String?, environment: String?,
         replay: Boolean, maskText: Boolean,
+        /** `trackViews`, `hangThresholdMs`, `propagateTo`, `profileLaunch`, `buildId` (see [WatchtowerConfig.rumOptions]). */
+        options: Map<String, Any?>,
     )
 
     fun recordError(name: String, message: String, stack: String, handled: Boolean)
@@ -19,7 +21,7 @@ fun Watchtower.startIos(bridge: IosNativeBridge, config: WatchtowerConfig) {
     setBridge(object : NativeBridge {
         override fun start(config: WatchtowerConfig) = bridge.start(
             config.key, config.service, config.endpoint, config.release, config.environment,
-            config.replay, config.maskText,
+            config.replay, config.maskText, config.rumOptions(),
         )
 
         override fun recordError(t: Throwable, handled: Boolean) =

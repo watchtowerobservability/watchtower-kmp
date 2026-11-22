@@ -11,9 +11,25 @@ data class WatchtowerConfig(
     val replay: Boolean = false,
     /** Mask every text view and input in replay (default). */
     val maskText: Boolean = true,
+    /** One RUM `view` per resumed screen (activity / view controller). */
+    val trackViews: Boolean = true,
+    /** The main thread counts as hung (ANR / app hang) after this many ms. */
+    val hangThresholdMs: Long = 5000,
+    /** URL prefixes that get a W3C `traceparent` header. */
+    val propagateTo: List<String> = emptyList(),
+    /** Sample the main thread until the first frame of a cold launch (`app_launch_profile`). */
+    val profileLaunch: Boolean = false,
+    /** The debug-file build id (dSYM UUID, ProGuard mapping id) added to every error. */
+    val buildId: String? = null,
 ) {
     // The key must never reach logs.
     override fun toString() = "WatchtowerConfig(service=$service, endpoint=$endpoint, key=***)"
+
+    /** The RUM options as the map the iOS bridge reads (keys as in the native `Config`). */
+    fun rumOptions(): Map<String, Any?> = mapOf(
+        "trackViews" to trackViews, "hangThresholdMs" to hangThresholdMs, "propagateTo" to propagateTo,
+        "profileLaunch" to profileLaunch, "buildId" to buildId,
+    )
 }
 
 /** What a platform must provide; implemented for Android here and for iOS by a Swift bridge. */
