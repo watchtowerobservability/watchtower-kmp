@@ -7,10 +7,10 @@ Kotlin Multiplatform common API for Watchtower. Shared code calls one API; Andro
 
 ```kotlin
 // build.gradle.kts, commonMain (the Android SDK comes in transitively on androidMain)
-implementation("dev.watchtower:watchtower-kmp:0.1.1")
+implementation("io.github.watchtowerobservability:watchtower-kmp:0.1.1")
 ```
 
-Artifacts are published to GitHub Packages (`https://maven.pkg.github.com/watchtowerobservability/watchtower-kmp`).
+Artifacts are published to Maven Central (`io.github.watchtowerobservability:watchtower-kmp`) and GitHub Packages.
 Add the `watchtower-ios` Swift package to the iOS app.
 
 ## Quick start

@@ -12,6 +12,11 @@ permissions:
 jobs:
   release:
     runs-on: macos-latest
+    env:
+      MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+      MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+      SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+      SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -32,3 +37,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" build/outputs/aar/*.aar --generate-notes --verify-tag
+      - name: Import signing key
+        if: env.SIGNING_KEY != ''
+        run: |
+          command -v gpg >/dev/null || brew install gnupg
+          printf '%s' "$SIGNING_KEY" | gpg --batch --import
+      # Maven Central via the Central Portal OSSRH staging API: upload, then the manual-upload POST
+      # that closes and publishes the staging repository. Skipped when the secrets are unset or the
+      # version is already on Central.
+      - name: Maven Central
+        if: env.MAVEN_CENTRAL_USERNAME != ''
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          if curl -fsI "https://repo1.maven.org/maven2/io/github/watchtowerobservability/watchtower-kmp/$V/" >/dev/null; then
+            echo "watchtower-kmp $V is already on Maven Central"; exit 0
+          fi
+          gradle publishAllPublicationsToMavenCentralRepository
+          AUTH=$(printf '%s:%s' "$MAVEN_CENTRAL_USERNAME" "$MAVEN_CENTRAL_PASSWORD" | base64 | tr -d '\n')
+          curl -fS -X POST -H "Authorization: Bearer $AUTH" \
+            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.watchtowerobservability?publishing_type=automatic"
